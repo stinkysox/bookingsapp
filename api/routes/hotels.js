@@ -8,17 +8,18 @@ import {
   getallhotels,
   updateHotel,
 } from "../controllers/hotel.js";
+import { verifyToken, verifyAdmin } from "../utils/verifyToken.js";
 
-// Create hotel
-router.post("/", createhotel);
+// Create hotel - only admin
+router.post("/", verifyToken, verifyAdmin, createhotel);
 
-// update hotel
-router.put("/:id", updateHotel);
+// Update hotel - only admin
+router.put("/:id", verifyToken, verifyAdmin, updateHotel);
 
-//delete hotel
-router.delete("/:id", deleteHotel);
+// Delete hotel - only admin
+router.delete("/:id", verifyToken, verifyAdmin, deleteHotel);
 
-// get all hotels
+// Get all hotels - public
 router.get("/", getallhotels);
 
 export default router;

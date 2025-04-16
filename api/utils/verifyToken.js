@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import { createError } from "./error.js";
 
+// Just decode and attach the user
 export const verifyToken = (req, res, next) => {
   const token = req.cookies.access_token;
 
@@ -13,11 +14,25 @@ export const verifyToken = (req, res, next) => {
       return next(createError(403, "Token is not valid!"));
     }
 
-    if (!user) {
-      return next(createError(401, "Token has expired or is invalid"));
-    }
-
-    req.user = user; // Store the decoded user in the request object
+    req.user = user; // decoded token: { id: ..., isAdmin: ..., iat: ... }
     next();
   });
+};
+
+// Check if the user is the one intended or an admin
+export const verifyUser = (req, res, next) => {
+  if (req.user.id === req.params.id || req.user.isAdmin) {
+    next();
+  } else {
+    return next(createError(403, "You are not authorized!"));
+  }
+};
+
+// Only admin check
+export const verifyAdmin = (req, res, next) => {
+  if (req.user.isAdmin) {
+    next();
+  } else {
+    return next(createError(403, "You are not authorized!"));
+  }
 };
